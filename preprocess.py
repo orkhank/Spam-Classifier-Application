@@ -1,5 +1,21 @@
 import re
 import string
+import pandas as pd
+
+
+def clean_data(df: pd.DataFrame):
+    data = df.copy()
+    data.drop(
+        data.columns[data.columns.str.contains("unnamed", case=False)],
+        axis=1,
+        inplace=True,
+    )
+
+    data.drop_duplicates()
+    data.drop(data[data["Body"] == "empty"].index, inplace=True)
+    data.dropna(inplace=True)
+
+    return data
 
 
 def remove_hyperlink(word):

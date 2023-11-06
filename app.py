@@ -3,25 +3,14 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import streamlit as st
-from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 from sklearn.model_selection import train_test_split
 
-from preprocess import preprocess_pipeline
+from preprocess import preprocess_pipeline, clean_data
+
+from st_pages import show_pages_from_config
 
 
-def clean_data(df: pd.DataFrame):
-    data = df.copy()
-    data.drop(
-        data.columns[data.columns.str.contains("unnamed", case=False)],
-        axis=1,
-        inplace=True,
-    )
-
-    data.drop_duplicates()
-    data.drop(data[data["Body"] == "empty"].index, inplace=True)
-    data.dropna(inplace=True)
-
-    return data
+show_pages_from_config()
 
 
 # datasets
@@ -36,7 +25,10 @@ dataset_dict = {
 with st.sidebar:
     dataset_selectbox = st.selectbox("# Dataset", dataset_dict.keys())
 
-data = clean_data(pd.read_csv(dataset_dict[dataset_selectbox]))
+if not dataset_selectbox:
+    st.stop()
+
+data = clean_data(pd.read_csv(dataset_dict[dataset_selectbox]))  # type: ignore
 
 # Plot pie chart of ham/spam distribution
 fig = plt.figure()
@@ -64,8 +56,8 @@ st.write(X_train[:5])
 from sklearn.preprocessing import LabelEncoder
 
 le = LabelEncoder()
-y_train = le.fit_transform(target_train.values)
-y_test = le.transform(target_test.values)
+y_train = np.array(le.fit_transform(target_train.values))
+y_test = np.array(le.transform(target_test.values))
 
 
 # CounterVectorizer Convert the text into matrics
@@ -111,7 +103,7 @@ ax.set_title("Confusion Matrix")
 ax.xaxis.set_ticklabels(["Not Spam", "Spam"])
 ax.yaxis.set_ticklabels(["Not Spam", "Spam"])
 
-st.pyplot(ax.figure)
+st.pyplot(ax.figure)  # type: ignore
 
 # ROC Curve
 y = np.array([0, 0, 1, 1])
