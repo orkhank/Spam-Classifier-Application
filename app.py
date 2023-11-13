@@ -4,8 +4,7 @@ import pandas as pd
 import seaborn as sns
 import streamlit as st
 from sklearn.model_selection import train_test_split
-from preprocess import preprocess_pipeline, clean_data
-from st_pages import show_pages_from_config
+from preprocess import default_preprocess_steps_dict, clean_data
 from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
@@ -32,20 +31,13 @@ class SpamClassifierApp:
             "LingSpam": f"{self.dataset_folder}/lingSpam.csv",
         }
         self.algorithmList = ["Naive Bayes", "SVM", "Random Forest"]
-        self.cleaning_utils = {
-            "remove_hyperlink": remove_hyperlink,
-            "replace_newline": replace_newline,
-            "to_lower": to_lower,
-            "remove_number": remove_number,
-            "remove_punctuation": remove_punctuation,
-            "remove_whitespace": remove_whitespace,
-        }
+        self.cleaning_utils = default_preprocess_steps_dict.keys()
 
     def load_data(self):
         with st.sidebar:
             dataset_selectbox = st.selectbox("# Dataset", self.dataset_dict.keys())
             algorithm_selectbox = st.selectbox("# Algorithm", self.algorithmList)
-            preprocess_utils_multibox = st.multiselect("# Preprocess", self.cleaning_utils.keys())
+            preprocess_utils_multibox = st.multiselect("# Preprocess", self.cleaning_utils)
 
         if (not dataset_selectbox )or (not algorithm_selectbox) or( not preprocess_utils_multibox):
             st.stop()
@@ -53,26 +45,27 @@ class SpamClassifierApp:
         data = clean_data(pd.read_csv(self.dataset_dict[dataset_selectbox]))
         return data, algorithm_selectbox, preprocess_utils_multibox
 
-    def preprocess_data(self, data , algorithm_selectbox, preprocess_utils):
-        # Your preprocess pipeline here
-        pass
+    def preprocess_steps(self):
+        # TODO: get the preprocess steps from the user
+
+        # for now default steps are used
+        return list(default_preprocess_steps_dict.items())
+       
 
     def split_data(self, data , algorithm_selectbox, preprocess_utils):
         emails_train, emails_test, target_train, target_test = train_test_split(
             data["Body"], data["Label"], test_size=0.2, random_state=42
         )
 
-        X_train = [preprocess_pipeline(x, [self.cleaning_utils.get(util) for util in preprocess_utils]) for x in emails_train]
-        X_test = [preprocess_pipeline(x, [self.cleaning_utils.get(util) for util in preprocess_utils]) for x in emails_test]
         le = LabelEncoder()
         
         y_train = np.array(le.fit_transform(target_train.values))
         y_test = np.array(le.transform(target_test.values))
 
-        return X_train, X_test, y_train, y_test
+        return emails_train, emails_test, y_train, y_test
 
     def train_naive_bayes(self, X_train, y_train):
-        naive_bayes_clf = Pipeline([("vectorizer", CountVectorizer()), ("nb", MultinomialNB())])
+        naive_bayes_clf = Pipeline(self.preprocess_steps() + [("vectorizer", CountVectorizer()), ("nb", MultinomialNB())])
         naive_bayes_clf.fit(X_train, y_train)
         return naive_bayes_clf
 

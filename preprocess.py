@@ -164,11 +164,11 @@ class NewlineReplacer(BaseEstimator, TransformerMixin):
         return [text.replace("\n", " ") for text in X]
 
 
-default_preprocess_steps = [
-    ("hyperlink_remover", HyperlinkRemover()),
-    ("to_lower", ToLower()),
-    ("number_remover", NumberRemover()),
-    ("punctuation_remover", PunctuationRemover()),
-    ("whitespace_remover", WhitespaceRemover()),
-    ("newline_replacer", NewlineReplacer()),
-]
+default_preprocess_steps_dict = {
+    "hyperlink_remover": HyperlinkRemover(),
+    "to_lower": ToLower(),
+    "number_remover": NumberRemover(),
+    "punctuation_remover": PunctuationRemover(),
+    "whitespace_remover": WhitespaceRemover(),
+    "newline_replacer": NewlineReplacer(),
+}
