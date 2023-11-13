@@ -5,7 +5,7 @@ import seaborn as sns
 import streamlit as st
 from sklearn.model_selection import train_test_split
 
-from preprocess import preprocess_pipeline, clean_data
+from preprocess import default_preprocess_steps, clean_data
 
 from st_pages import show_pages_from_config
 
@@ -41,15 +41,9 @@ with st.expander("See dataset"):
     st.table(data)
 
 
-emails_train, emails_test, target_train, target_test = train_test_split(
+x_train, x_test, target_train, target_test = train_test_split(
     data["Body"], data["Label"], test_size=0.2, random_state=42
 )
-
-X_train = [preprocess_pipeline(x) for x in emails_train]
-X_test = [preprocess_pipeline(x) for x in emails_test]
-
-# print 5 training samples
-st.write(X_train[:5])
 
 
 # Encode labels
@@ -65,8 +59,9 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 
+steps = default_preprocess_steps + [("nb", MultinomialNB())]
 naive_bayes_clf = Pipeline([("vectorizer", CountVectorizer()), ("nb", MultinomialNB())])
-naive_bayes_clf.fit(X_train, y_train)
+naive_bayes_clf.fit(x_train, y_train)
 
 
 # ------- Metrics and Performance -------
@@ -82,7 +77,7 @@ from sklearn.metrics import (
 )
 
 # Scores
-y_predict = [1 if o > 0.5 else 0 for o in naive_bayes_clf.predict(X_test)]
+y_predict = [1 if o > 0.5 else 0 for o in naive_bayes_clf.predict(x_test)]
 
 st.write("Accuracy: {:.2f}%".format(100 * accuracy_score(y_test, y_predict)))
 st.write("Precision: {:.2f}%".format(100 * precision_score(y_test, y_predict)))

@@ -1,6 +1,7 @@
 import re
 import string
 import pandas as pd
+from sklearn.base import BaseEstimator, TransformerMixin
 
 
 def clean_data(df: pd.DataFrame):
@@ -18,44 +19,156 @@ def clean_data(df: pd.DataFrame):
     return data
 
 
-def remove_hyperlink(word):
-    return re.sub(r"http\S+", "", word)
+class HyperlinkRemover(BaseEstimator, TransformerMixin):
+    """
+    Remove hyperlinks from a list of texts.
+    """
+
+    def __init__(self):
+        pass
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        """
+        Remove hyperlinks from a list of texts.
+
+        Args:
+        - X (list): List of texts containing hyperlinks.
+
+        Returns:
+        - list: List of texts with hyperlinks removed.
+        """
+        return [re.sub(r"http\S+", "", text) for text in X]
 
 
-def to_lower(word):
-    result = word.lower()
-    return result
+class ToLower(BaseEstimator, TransformerMixin):
+    """
+    Converts a list of text to lowercase.
+    """
+
+    def __init__(self):
+        pass
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        """
+        Converts a list of text to lowercase.
+
+        Parameters:
+        - X (list): List of strings to be converted.
+
+        Returns:
+        - list: List of strings in lowercase.
+        """
+        return [text.lower() for text in X]
 
 
-def remove_number(word):
-    result = re.sub(r"\d+", "", word)
-    return result
+class NumberRemover(BaseEstimator, TransformerMixin):
+    """
+    Remove elements from a list of text that contain numbers using regex.
+    """
+
+    def __init__(self):
+        pass
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        """
+        Remove elements from a list of text that contain numbers using regex.
+
+        Parameters:
+        - X (list): List of text elements.
+
+        Returns:
+        - list: New list with elements that do not contain numbers.
+        """
+        return [re.sub(r"\d+", "", text) for text in X]
 
 
-def remove_punctuation(word):
-    result = word.translate(str.maketrans(dict.fromkeys(string.punctuation)))
-    return result
+class PunctuationRemover(BaseEstimator, TransformerMixin):
+    """
+    Remove punctuation from a list of text using string.translate.
+    """
+
+    def __init__(self):
+        pass
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        """
+        Remove punctuation from a list of text using string.translate.
+
+        Parameters:
+        - X (list): List of text elements.
+
+        Returns:
+        - list: New list with punctuation removed from each text element.
+        """
+        translator = str.maketrans("", "", string.punctuation)
+        return [text.translate(translator) for text in X]
 
 
-def remove_whitespace(word):
-    result = word.strip()
-    return result
+class WhitespaceRemover(BaseEstimator, TransformerMixin):
+    """
+    Remove leading and trailing whitespaces from a list of text.
+    """
+
+    def __init__(self):
+        pass
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        """
+        Remove leading and trailing whitespaces from a list of text.
+
+        Parameters:
+        - X (list): List of text elements.
+
+        Returns:
+        - list: New list with leading and trailing whitespaces removed.
+        """
+        return [text.strip() for text in X]
 
 
-def replace_newline(word):
-    return word.replace("\n", " ")
+class NewlineReplacer(BaseEstimator, TransformerMixin):
+    """
+    Replace newline characters with a space in a list of text.
+    """
+
+    def __init__(self):
+        pass
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        """
+        Replace newline characters with a space in a list of text.
+
+        Parameters:
+        - X (list): List of text elements.
+
+        Returns:
+        - list: New list with newline characters replaced by spaces.
+        """
+        return [text.replace("\n", " ") for text in X]
 
 
-def preprocess_pipeline(sentence):
-    cleaning_utils = [
-        remove_hyperlink,
-        replace_newline,
-        to_lower,
-        remove_number,
-        remove_punctuation,
-        remove_whitespace,
-    ]
-    for util in cleaning_utils:
-        sentence = util(sentence)
-
-    return sentence
+default_preprocess_steps = [
+    ("hyperlink_remover", HyperlinkRemover()),
+    ("to_lower", ToLower()),
+    ("number_remover", NumberRemover()),
+    ("punctuation_remover", PunctuationRemover()),
+    ("whitespace_remover", WhitespaceRemover()),
+    ("newline_replacer", NewlineReplacer()),
+]
