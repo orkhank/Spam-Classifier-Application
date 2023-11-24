@@ -7,3 +7,7 @@ icon = ":house:"
 path = "eda.py"
 name = "Exploratory Data Analysis"
 icon = ":mag_right:"
+
+[[pages]]
+path = "testing.py"
+name = "Testing"
