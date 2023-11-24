@@ -1,7 +1,12 @@
 import re
 import string
+import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 
 
 def clean_data(df: pd.DataFrame):
@@ -40,7 +45,7 @@ class HyperlinkRemover(BaseEstimator, TransformerMixin):
         Returns:
         - list: List of texts with hyperlinks removed.
         """
-        return [re.sub(r"http\S+", "", text) for text in X]
+        return np.array([re.sub(r"http\S+", "", text) for text in X])
 
 
 class ToLower(BaseEstimator, TransformerMixin):
@@ -64,7 +69,7 @@ class ToLower(BaseEstimator, TransformerMixin):
         Returns:
         - list: List of strings in lowercase.
         """
-        return [text.lower() for text in X]
+        return np.array([text.lower() for text in X])
 
 
 class NumberRemover(BaseEstimator, TransformerMixin):
@@ -88,7 +93,7 @@ class NumberRemover(BaseEstimator, TransformerMixin):
         Returns:
         - list: New list with elements that do not contain numbers.
         """
-        return [re.sub(r"\d+", "", text) for text in X]
+        return np.array([re.sub(r"\d+", "", text) for text in X])
 
 
 class PunctuationRemover(BaseEstimator, TransformerMixin):
@@ -97,7 +102,7 @@ class PunctuationRemover(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self):
-        pass
+        self.translator = str.maketrans("", "", string.punctuation)
 
     def fit(self, X, y=None):
         return self
@@ -112,8 +117,7 @@ class PunctuationRemover(BaseEstimator, TransformerMixin):
         Returns:
         - list: New list with punctuation removed from each text element.
         """
-        translator = str.maketrans("", "", string.punctuation)
-        return [text.translate(translator) for text in X]
+        return np.array([text.translate(self.translator) for text in X])
 
 
 class WhitespaceRemover(BaseEstimator, TransformerMixin):
@@ -137,7 +141,7 @@ class WhitespaceRemover(BaseEstimator, TransformerMixin):
         Returns:
         - list: New list with leading and trailing whitespaces removed.
         """
-        return [text.strip() for text in X]
+        return np.array([" ".join(text.split()) for text in X])
 
 
 class NewlineReplacer(BaseEstimator, TransformerMixin):
@@ -161,14 +165,138 @@ class NewlineReplacer(BaseEstimator, TransformerMixin):
         Returns:
         - list: New list with newline characters replaced by spaces.
         """
-        return [text.replace("\n", " ") for text in X]
+        return np.array([text.replace("\n", " ") for text in X])
 
 
-default_preprocess_steps_dict = {
-    "hyperlink_remover": HyperlinkRemover(),
+class WordStemmer(BaseEstimator, TransformerMixin):
+    """
+    A scikit-learn compatible text transformer for stemming words using the Porter Stemmer algorithm.
+    """
+
+    def __init__(self):
+        self.stemmer = PorterStemmer()
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        """
+        Transforms the input data by stemming each word in the text.
+
+        Parameters:
+        - X: array-like or pd.Series, shape (n_samples,): Input data.
+
+        Returns:
+        - results: list, shape (n_samples,): Transformed data with stemmed words.
+        """
+        results = []
+        for text in X:
+            stem_words = [self.stemmer.stem(o) for o in word_tokenize(text)]
+            results.append(" ".join(stem_words))
+        return np.array(results)
+
+
+class WordLemmatizer(BaseEstimator, TransformerMixin):
+    """
+    A custom transformer for lemmatizing words in a list of text using NLTK's WordNetLemmatizer.
+    """
+
+    def __init__(self):
+        self.lemmatizer = WordNetLemmatizer()
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        """
+        Transform method to lemmatize words in a list of text.
+
+        Parameters:
+        - X (list): List of text elements.
+
+        Returns:
+        - list: New list with words lemmatized.
+        """
+        results = []
+        for text in X:
+            lemma_words = [self.lemmatizer.lemmatize(o) for o in word_tokenize(text)]
+            results.append(" ".join(lemma_words))
+        return np.array(results)
+
+
+class StopWordRemover(BaseEstimator, TransformerMixin):
+    """
+    Custom scikit-learn transformer for removing stop words from a list of text.
+    """
+
+    def __init__(self):
+        nltk.download("stopwords")
+        self.stop_words = set(stopwords.words("english"))
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        """
+        Removes stop words from each text element in the input list.
+
+        Parameters:
+        - X (list): List of text elements.
+
+        Returns:
+        - list: List of text elements with stop words removed.
+        """
+        results = []
+        for text in X:
+            filtered_sentence = [
+                w for w in word_tokenize(text) if not w in self.stop_words
+            ]
+            results.append(" ".join(filtered_sentence))
+        return np.array(results)
+
+
+preprocess_dict = {
     "to_lower": ToLower(),
-    "number_remover": NumberRemover(),
     "punctuation_remover": PunctuationRemover(),
-    "whitespace_remover": WhitespaceRemover(),
+    "number_remover": NumberRemover(),
+    "hyperlink_remover": HyperlinkRemover(),
     "newline_replacer": NewlineReplacer(),
+    "whitespace_remover": WhitespaceRemover(),
+    "stopword_remover": StopWordRemover(),
+    "word_stemmer": WordStemmer(),
+    "word_lemmatizer": WordLemmatizer(),
 }
+
+
+class Preprocess:
+    def __init__(self):
+        self.steps = preprocess_dict
+
+    def get_steps(self):
+        import streamlit as st
+
+        # get preprocess steps from user
+        for preprocess_name, transformer in preprocess_dict.items():
+            st.toggle(
+                preprocess_name,
+                True,
+                f"{preprocess_name}_key",
+                help=transformer.__doc__,
+            )
+
+        # save chosen steps
+        self.steps = {
+            preprocess_name: transformer
+            for preprocess_name, transformer in preprocess_dict.items()
+            if st.session_state.get(f"{preprocess_name}_key", False)
+        }
+        # st.write(self.steps)
+    
+    def transform(self, X):
+        results = X.copy()
+        for step in self.steps.values():
+            results = step.transform(results)
+        
+        return results
+                
+            

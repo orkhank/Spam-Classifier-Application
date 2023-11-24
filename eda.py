@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from st_pages import add_indentation
 
+from preprocess import Preprocess, clean_data
+
+
 def explore_data(data: pd.DataFrame):
     # Print samples
     with st.expander("Samples from the dataset(s)"):
@@ -11,7 +14,7 @@ def explore_data(data: pd.DataFrame):
     # Plot pie chart of ham/spam distribution
     with st.expander("Ham/Spam Distribution"):
         label_counts = data["Label"].value_counts()
-        label_counts.rename({0:"Not Spam", 1:"Spam"}, inplace=True)
+        label_counts.rename({0: "Not Spam", 1: "Spam"}, inplace=True)
         st.write("## Label Counts")
         col1, col2 = st.columns(2)
         with col1:
@@ -30,10 +33,8 @@ def explore_data(data: pd.DataFrame):
     data.info(buf=buffer)
     s = buffer.getvalue()
     st.text(s)
-    # natural language tool kit
-    import nltk
 
-    nltk.download("punkt")
+    # TODO: Show word clouds
 
 add_indentation()
 
@@ -58,10 +59,32 @@ if not dataset_name_multibox:
     st.stop()
 
 # Concatanate given datasets
-data = pd.concat(
+raw_data = pd.concat(
     [pd.read_csv(dataset_dict[dataset_name]) for dataset_name in dataset_name_multibox]
 )
 
 with raw_data_tab:
-    explore_data(data)
+    explore_data(raw_data)
 
+with preprocessed_data_tab:
+    data = clean_data(raw_data)
+    limited_data = data.sample(500)
+    preprocess = Preprocess()
+    with st.expander("Preprocess Steps"):
+        preprocess.get_steps()
+
+    from sklearn.preprocessing import LabelEncoder
+
+    st.write(limited_data)
+    st.write(limited_data["Label"])
+    st.write(pd.DataFrame(preprocess.transform(limited_data["Body"])))
+    preprocessed_data = pd.concat(
+        [
+            pd.DataFrame(preprocess.transform(limited_data["Body"])),
+            limited_data["Label"],
+        ],
+        axis=1,
+    )
+    # le = LabelEncoder()
+    # limited_data["Label"] = le.fit_transform(limited_data["Label"])
+    explore_data(preprocessed_data)
