@@ -272,8 +272,11 @@ class Preprocess:
     def __init__(self):
         self.steps = preprocess_dict
 
-    def get_steps(self):
+    def get_steps(self, prompt: str = "Configure Preprocess Steps"):
         import streamlit as st
+
+        if prompt:
+            st.write(prompt)
 
         # get preprocess steps from user
         for preprocess_name, transformer in preprocess_dict.items():
@@ -291,12 +294,17 @@ class Preprocess:
             if st.session_state.get(f"{preprocess_name}_key", False)
         }
         # st.write(self.steps)
-    
+
+    @property
+    def list_of_steps(self):
+        return list(self.steps.items())
+
     def transform(self, X):
         results = X.copy()
         for step in self.steps.values():
             results = step.transform(results)
-        
+
+        # import streamlit as st
+        # st.write(results)
+
         return results
-                
-            
