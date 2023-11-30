@@ -1,3 +1,5 @@
+# TODO: implement SVM and its settings
+
 class SVM:
     def __init__(self):
         raise NotImplementedError

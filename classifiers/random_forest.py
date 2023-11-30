@@ -1,3 +1,6 @@
+# TODO: implement RandomForest and its settings
+
+
 class RandomForest:
     def __init__(self):
         raise NotImplementedError

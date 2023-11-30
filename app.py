@@ -53,6 +53,7 @@ class SpamClassifierApp:
         def preprocess(data):
             return self.preprocess.transform(data)
 
+        # TODO: find some way to decrease the decrease preprocessing time (current version TAKES AGES)
         preprocessed_emails_train = preprocess(emails_train)
         preprocessed_emails_test = preprocess(emails_test)
 
@@ -66,9 +67,12 @@ class SpamClassifierApp:
         # tfidf_matrix = self.classifier.feature_extractor.fit_transform(X)
         # print(tfidf_matrix.toarray())
         # print(self.classifier.feature_extractor.vocabulary_)
+        # TODO: record train time
         self.classifier.fit(X, y)
 
     def evaluate_clf(self, X_test, y_test):
+        # TODO: show evaluation/training time complexity
+        # TODO: make the evaluation chart and drawing more appealing and informative
         y_predict = [1 if o > 0.5 else 0 for o in self.classifier.predict(X_test)]
 
         st.write("Accuracy: {:.2f}%".format(100 * accuracy_score(y_test, y_predict)))

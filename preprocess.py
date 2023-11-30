@@ -1,3 +1,5 @@
+# TODO: implement a better way to preprocess text. the current version is way too inefficient
+
 import re
 import string
 import numpy as np
