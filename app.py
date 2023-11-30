@@ -5,7 +5,8 @@ import seaborn as sns
 import streamlit as st
 from st_pages import show_pages_from_config
 from sklearn.model_selection import train_test_split
-from preprocess import Preprocess, clean_data
+from dataset import Datasets
+from preprocess import Preprocess
 from sklearn.preprocessing import LabelEncoder
 from classifiers.naive_bayes import NaiveBayes
 from classifiers.svm import SVM
@@ -24,12 +25,7 @@ from sklearn.metrics import (
 
 class SpamClassifierApp:
     def __init__(self):
-        self.dataset_folder = "datasets/archive"
-        self.dataset_dict = {
-            "Spam Assassin": f"{self.dataset_folder}/completeSpamAssassin.csv",
-            "EnronSpam": f"{self.dataset_folder}/enronSpamSubset.csv",
-            "LingSpam": f"{self.dataset_folder}/lingSpam.csv",
-        }
+        self.data = None
         self.classifier_name_dict = {
             "Naive Bayes": NaiveBayes,
             # "SVM": SVM,
@@ -44,27 +40,9 @@ class SpamClassifierApp:
         )
         self.classifier = self.classifier_name_dict[classifier_selectbox]()
         self.classifier.get_parameters()
-        dataset_selectbox = st.selectbox("# Dataset", self.dataset_dict.keys())
+        self.data = Datasets.get_single()
         with st.expander("Configure Preprocess Steps"):
             self.preprocess.get_steps(None)
-        if not dataset_selectbox:
-            st.stop()
-
-        @st.cache_data(show_spinner=False)
-        def fetch_and_clean_data(name):
-            with st.spinner("Loading Data..."):
-                raw_data = pd.read_csv(self.dataset_dict[name])
-            with st.spinner("Cleaning Raw Data..."):
-                data = clean_data(raw_data)
-
-            return data
-
-        data = fetch_and_clean_data(dataset_selectbox)
-
-        data_size = st.slider(
-            "Configure Data Size", 10, data.shape[0], data.shape[0] // 2, 10, "%d"
-        )
-        self.data = data.sample(data_size)
 
     def split_data(self):
         emails_train, emails_test, target_train, target_test = train_test_split(

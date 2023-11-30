@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from st_pages import add_indentation
 
-from preprocess import Preprocess, clean_data
+from preprocess import Preprocess
+from dataset import Datasets
 
 
 def explore_data(data: pd.DataFrame):
@@ -36,38 +37,19 @@ def explore_data(data: pd.DataFrame):
 
     # TODO: Show word clouds
 
+
 add_indentation()
 
 raw_data_tab, preprocessed_data_tab = st.tabs(["Raw Data", "Preprocessed Data"])
 
-# datasets
-dataset_folder = "datasets/archive"
-dataset_names = ["Spam Assassin", "EnronSpam", "LingSpam"]
-dataset_paths = [
-    f"{dataset_folder}/completeSpamAssassin.csv",
-    f"{dataset_folder}/enronSpamSubset.csv",
-    f"{dataset_folder}/lingSpam.csv",
-]
-dataset_dict = {name: path for name, path in zip(dataset_names, dataset_paths)}
-
-
 with st.sidebar:
-    dataset_name_multibox = st.multiselect("# Dataset", dataset_names, dataset_names[0])
-
-if not dataset_name_multibox:
-    st.warning("Please select a dataset or a combination of datasets from the sidebar.")
-    st.stop()
-
-# Concatanate given datasets
-raw_data = pd.concat(
-    [pd.read_csv(dataset_dict[dataset_name]) for dataset_name in dataset_name_multibox]
-)
+    raw_data = Datasets.get_multi(raw=True)
 
 with raw_data_tab:
     explore_data(raw_data)
 
 with preprocessed_data_tab:
-    data = clean_data(raw_data)
+    data = Datasets.clean_data(raw_data)
     limited_data = data.sample(500)
     preprocess = Preprocess()
     with st.expander("Preprocess Steps"):
@@ -75,6 +57,7 @@ with preprocessed_data_tab:
 
     from sklearn.preprocessing import LabelEncoder
 
+    # TODO: correctly combine the preprocessed text (X) with labels (Y)
     st.write(limited_data)
     st.write(limited_data["Label"])
     st.write(pd.DataFrame(preprocess.transform(limited_data["Body"])))

@@ -9,7 +9,7 @@ from sklearn.naive_bayes import (
 )
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.pipeline import Pipeline
-from preprocess import Preprocess, clean_data
+from preprocess import Preprocess
 
 import streamlit as st
 
@@ -43,14 +43,3 @@ class NaiveBayes:
     def predict(self, X):
         return self.clf.predict(X)
 
-
-# datasets
-dataset_folder = "datasets/archive"
-dataset_dict = {
-    "Spam Assassin": f"{dataset_folder}/completeSpamAssassin.csv",
-    "EnronSpam": f"{dataset_folder}/enronSpamSubset.csv",
-    "LingSpam": f"{dataset_folder}/lingSpam.csv",
-}
-
-
-data = clean_data(pd.read_csv(dataset_dict["Spam Assassin"]))
