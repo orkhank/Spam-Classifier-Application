@@ -8,6 +8,7 @@ from dataset import Datasets
 
 
 def explore_data(data: pd.DataFrame):
+    # TODO: add character_count, word_count, sentence_count information for each email and compare them based on ham/spam
     # Print samples
     with st.expander("Samples from the dataset(s)"):
         st.write(data.sample(5))

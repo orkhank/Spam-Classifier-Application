@@ -54,6 +54,7 @@ class SpamClassifierApp:
             return self.preprocess.transform(data)
 
         # TODO: find some way to decrease the decrease preprocessing time (current version TAKES AGES)
+        # ? Maybe preprocess all datasets before hand and let the user choose if it is worth to wait for the customs preprocess steps to finish or just use fast and the default preset
         preprocessed_emails_train = preprocess(emails_train)
         preprocessed_emails_test = preprocess(emails_test)
 

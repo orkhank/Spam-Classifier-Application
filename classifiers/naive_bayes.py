@@ -35,6 +35,10 @@ class NaiveBayes:
             [("vectorizer", self.feature_extractor), ("nb", self.algorithm)]
         )
 
+        self.optimize_hyperparameters = st.toggle(
+            "Optimize Hyperparameters", False, disabled=True
+        )
+
     def fit(self, X, y, **fit_params):
         # st.write(X, y, self.clf)
         assert self.clf is not None, "Pipeline has not been initialized."
