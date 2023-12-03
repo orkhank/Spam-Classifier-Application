@@ -25,11 +25,14 @@ class Datasets:
         else:
             with st.spinner("Cleaning Raw Data..."):
                 data = Datasets.clean_data(raw_data)
+        
+        previous_data_size = st.session_state.setdefault("data_size", 1000)
+        total_data_size = data.shape[0]
         data_size = st.slider(
-            "Configure Data Size", 10, data.shape[0], data.shape[0] // 2, 10, "%d"
+            "Configure Data Size", 10, total_data_size, min(previous_data_size, total_data_size), 10, "%d"
         )
 
-        return data.sample(data_size)
+        return data.sample(data_size, random_state=42)
 
     @staticmethod
     def get_multi(raw: bool = False):
