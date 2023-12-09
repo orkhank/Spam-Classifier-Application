@@ -51,21 +51,23 @@ with raw_data_tab:
 
 with preprocessed_data_tab:
     data = Datasets.clean_data(raw_data)
-    limited_data = data.sample(500)
     preprocess = Preprocess()
     with st.expander("Preprocess Steps"):
         preprocess.get_steps()
 
-    from sklearn.preprocessing import LabelEncoder
+    # from sklearn.preprocessing import LabelEncoder
 
-    # TODO: correctly combine the preprocessed text (X) with labels (Y)
-    st.write(limited_data)
-    st.write(limited_data["Label"])
-    st.write(pd.DataFrame(preprocess.transform(limited_data["Body"])))
+    st.write(data)
+    preprocessed_body = pd.DataFrame(
+        preprocess.transform(data["Body"]),
+        columns=["Body"],
+        index=data.index,
+    )
+    st.write(preprocessed_body)
     preprocessed_data = pd.concat(
         [
-            pd.DataFrame(preprocess.transform(limited_data["Body"])),
-            limited_data["Label"],
+            preprocessed_body,
+            data["Label"],
         ],
         axis=1,
     )
