@@ -242,10 +242,26 @@ class StopWordRemover(BaseEstimator, TransformerMixin):
         return np.array(results)
 
 
+class NonAlphabeticRemover(BaseEstimator, TransformerMixin):
+    """
+    Remove Any Non-Alphabetic Character From The Text
+    """
+
+    def __init__(self):
+        pass
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return np.array([re.sub("[^A-Za-z]+", " ", text) for text in X])
+
+
 preprocess_dict = {
     "to_lower": ToLower(),
     "punctuation_remover": PunctuationRemover(),
     "number_remover": NumberRemover(),
+    "non_alphabetic_remover": NonAlphabeticRemover(),
     "hyperlink_remover": HyperlinkRemover(),
     "newline_replacer": NewlineReplacer(),
     "whitespace_remover": WhitespaceRemover(),
@@ -295,3 +311,17 @@ class Preprocess:
         # st.write(results)
 
         return results
+
+
+# TODO: add something like to following (taken from https://gtraskas.github.io/post/ex6_spam/)
+# # Handle URLS.
+# # Look for strings starting with http:// or https://.
+# email_contents = re.sub('(http|https)://[^\s]*', 'httpaddr', email_contents)
+
+# # Handle Email Addresses.
+# # Look for strings with @ in the middle.
+# email_contents = re.sub('[^\s]+@[^\s]+', 'emailaddr', email_contents)
+
+# # Handle $ sign.
+# # Look for "$" and replace it with the text "dollar".
+# email_contents = re.sub('[$]+', 'dollar', email_contents)
