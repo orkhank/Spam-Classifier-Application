@@ -10,23 +10,24 @@ from sklearn.naive_bayes import (
 )
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.pipeline import Pipeline
+from classifiers.base import Classifier
 from preprocess import Preprocess
 
 import streamlit as st
 
 
-class NaiveBayes:
+class NaiveBayes(Classifier):
     def __init__(self):
         self.preprocess = Preprocess()
-        self.feature_extractor = TfidfVectorizer()
-        self.algorithm = MultinomialNB()
+        self.feature_extractor = None
+        self.algorithm = MultinomialNB()  # TODO: optimize hyperparameters
         self.clf = None
 
     def get_parameters(self):
         feature_extractor = st.selectbox(
             "Select Feature Extractor", ["Count Vectorizer", "TF-IDF Vectorizer"]
         )
-        selectbox2vectorizer = {
+        selectbox2vectorizer = { #TODO: optimize hyperparameters
             "Count Vectorizer": CountVectorizer(),
             "TF-IDF Vectorizer": TfidfVectorizer(),
         }
@@ -38,12 +39,3 @@ class NaiveBayes:
         self.optimize_hyperparameters = st.toggle(
             "Optimize Hyperparameters", False, disabled=True
         )
-
-    def fit(self, X, y, **fit_params):
-        # st.write(X, y, self.clf)
-        assert self.clf is not None, "Pipeline has not been initialized."
-        self.clf.fit(X, y, **fit_params)
-        return self.clf
-
-    def predict(self, X):
-        return self.clf.predict(X)

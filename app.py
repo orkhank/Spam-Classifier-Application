@@ -5,6 +5,7 @@ import seaborn as sns
 import streamlit as st
 from st_pages import show_pages_from_config
 from sklearn.model_selection import train_test_split
+from classifiers.base import Classifier
 from dataset import Datasets
 from preprocess import Preprocess
 from sklearn.preprocessing import LabelEncoder
@@ -26,10 +27,10 @@ from sklearn.metrics import (
 class SpamClassifierApp:
     def __init__(self):
         self.data = None
-        self.classifier_name_dict = {
+        self.classifier_name_dict: dict[str, type[Classifier]] = {
             "Naive Bayes": NaiveBayes,
-            # "SVM": SVM,
-            # "Random Forest": RandomForest,
+            "SVM": SVM,
+            "Random Forest": RandomForest,
         }
         self.classifier = None
         self.preprocess = Preprocess()
@@ -38,6 +39,7 @@ class SpamClassifierApp:
         classifier_selectbox = st.selectbox(
             "# Classifier", self.classifier_name_dict.keys()
         )
+        assert classifier_selectbox is not None
         self.classifier = self.classifier_name_dict[classifier_selectbox]()
         self.classifier.get_parameters()
         self.data = Datasets.get_single()
