@@ -8,7 +8,6 @@ from sklearn.model_selection import train_test_split
 from classifiers.base import Classifier
 from dataset import Datasets
 from preprocess import Preprocess
-from sklearn.preprocessing import LabelEncoder
 from classifiers.naive_bayes import NaiveBayes
 from classifiers.svm import SVM
 from classifiers.random_forest import RandomForest
@@ -45,26 +44,6 @@ class SpamClassifierApp:
         self.data = Datasets.get_single()
         with st.expander("Configure Preprocess Steps"):
             self.preprocess.get_steps(None)
-
-    def split_data(self):
-        emails_train, emails_test, target_train, target_test = train_test_split(
-            self.data["Body"], self.data["Label"], test_size=0.2, random_state=42
-        )
-
-        @st.cache_data(show_spinner=False)
-        def preprocess(data):
-            return self.preprocess.transform(data)
-
-        # TODO: find some way to decrease the decrease preprocessing time (current version TAKES AGES)
-        # ? Maybe preprocess all datasets before hand and let the user choose if it is worth to wait for the customs preprocess steps to finish or just use fast and the default preset
-        preprocessed_emails_train = preprocess(emails_train)
-        preprocessed_emails_test = preprocess(emails_test)
-
-        le = LabelEncoder()
-        y_train = np.array(le.fit_transform(target_train.values))
-        y_test = np.array(le.transform(target_test.values))
-
-        return preprocessed_emails_train, preprocessed_emails_test, y_train, y_test
 
     def train_clf(self, X, y):
         # tfidf_matrix = self.classifier.feature_extractor.fit_transform(X)
@@ -115,7 +94,9 @@ if __name__ == "__main__":
     st.write(app.classifier.clf)
 
     with st.spinner("Preparing Data..."):
-        X_train, X_test, y_train, y_test = app.split_data()
+        X_train, X_test, y_train, y_test = Datasets.split_transform_data(
+            app.data, app.preprocess
+        )
     with st.spinner("Training The Classifier..."):
         naive_bayes_clf = app.train_clf(X_train, y_train)
     with st.spinner("Evaluating The Classifier..."):
