@@ -217,7 +217,7 @@ class StopWordRemover(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self):
-        nltk.download("stopwords")
+        nltk.download("stopwords", quiet=True)
         self.stop_words = set(stopwords.words("english"))
 
     def fit(self, X, y=None):
