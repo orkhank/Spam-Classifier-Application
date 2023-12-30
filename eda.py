@@ -46,10 +46,10 @@ def explore_data(data: pd.DataFrame):
         ham_wordcloud = WordCloud(width=800, height=400).generate(' '.join(data[data['Label'] == 0]['Body']))
 
         st.write("## Spam Word Cloud")
-        st.image(spam_wordcloud.to_image(), caption="Spam Word Cloud", use_container_width=True)
+        st.image(spam_wordcloud.to_image(), caption="Spam Word Cloud", use_column_width=True)
 
         st.write("## Ham Word Cloud")
-        st.image(ham_wordcloud.to_image(), caption="Ham Word Cloud", use_container_width=True)
+        st.image(ham_wordcloud.to_image(), caption="Ham Word Cloud", use_column_width=True)
     # TODO: Show word clouds
 
 
