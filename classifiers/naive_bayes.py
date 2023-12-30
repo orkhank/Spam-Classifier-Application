@@ -3,12 +3,7 @@ import numpy as np
 import pandas as pd
 from sklearn.naive_bayes import (
     MultinomialNB,
-    GaussianNB,
-    BernoulliNB,
-    CategoricalNB,
-    ComplementNB,
 )
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.pipeline import Pipeline
 from classifiers.base import Classifier
 from preprocess import Preprocess
@@ -18,24 +13,22 @@ import streamlit as st
 
 class NaiveBayes(Classifier):
     def __init__(self):
-        self.preprocess = Preprocess()
-        self.feature_extractor = None
-        self.algorithm = MultinomialNB()  # TODO: optimize hyperparameters
-        self.clf = None
+        self.algorithm_class = MultinomialNB
 
-    def get_parameters(self):
-        feature_extractor = st.selectbox(
-            "Select Feature Extractor", ["Count Vectorizer", "TF-IDF Vectorizer"]
-        )
-        selectbox2vectorizer = { #TODO: optimize hyperparameters
-            "Count Vectorizer": CountVectorizer(),
-            "TF-IDF Vectorizer": TfidfVectorizer(),
-        }
-        self.feature_extractor = selectbox2vectorizer[feature_extractor]
-        self.clf = Pipeline(
-            [("vectorizer", self.feature_extractor), ("nb", self.algorithm)]
-        )
+    def get_algorithm_settings(self):
+        settings = dict()
+        with st.expander("Naive Bayes Hyperparameters"):
+            settings["alpha"] = st.slider(
+                "Alpha",
+                0.0,
+                1.0,
+                0.5,
+                0.25,
+                help="Additive (Laplace/Lidstone) smoothing parameter (0 for no smoothing).",
+            )
+            settings["fit_prior"] = st.toggle(
+                "Fit Prior",
+                help="Whether to learn class prior probabilities or not. If false, a uniform prior will be used.",
+            )
 
-        self.optimize_hyperparameters = st.toggle(
-            "Optimize Hyperparameters", False, disabled=True
-        )
+        return settings
