@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 import numpy as np
 import pandas as pd
@@ -21,6 +22,21 @@ dataset_name_2_path_dict = {
 
 
 class Datasets:
+    """Class to handle the datasets"""
+    
+    @staticmethod
+    def assert_datasets_exist() -> None:
+        """Assert that the datasets exist """
+        if not os.path.exists(dataset_folder):
+            st.error("The datasets folder is missing.")
+            st.stop()
+            
+        for dataset_name, dataset_path in zip(dataset_names, dataset_paths):
+            if not os.path.exists(dataset_path):
+                st.error(f"The {dataset_name} dataset is missing.")
+                st.stop()
+    
+    
     @staticmethod
     def get_single(raw: Optional[bool] = False):
         """Get a single dataset from the dataset folder
@@ -32,6 +48,9 @@ class Datasets:
         Returns:
             pandas.DataFrame: The selected dataset
         """
+
+        Datasets.assert_datasets_exist()
+
         dataset_selectbox = st.selectbox("# Dataset", dataset_names)
         with st.spinner("Loading Data..."):
             raw_data = pd.read_csv(dataset_name_2_path_dict[dataset_selectbox])
@@ -65,6 +84,9 @@ class Datasets:
         Returns:
             pandas.DataFrame: The selected dataset
         """
+
+        Datasets.assert_datasets_exist()
+        
         dataset_name_multibox = st.multiselect(
             "# Dataset", dataset_names, dataset_names[0]
         )
