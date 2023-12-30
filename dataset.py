@@ -69,6 +69,7 @@ class Datasets:
             min(previous_data_size, total_data_size),
             10,
             "%d",
+            help="The number of samples to use for training and testing",
         )
 
         return data.sample(data_size, random_state=42)
@@ -117,6 +118,7 @@ class Datasets:
             min(previous_data_size, total_data_size),
             10,
             "%d",
+            help="The number of samples to use for training and testing",
         )
 
         return data.sample(data_size, random_state=42)
