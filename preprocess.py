@@ -10,7 +10,9 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import nltk
-nltk.download('wordnet')
+
+nltk.download("wordnet", quiet=True)
+
 
 class HyperlinkRemover(BaseEstimator, TransformerMixin):
     """
