@@ -66,16 +66,23 @@ class SpamClassifierApp:
     def evaluate_clf(self, X_test, y_test):
         # TODO: show evaluation/training time complexity
         # TODO: make the evaluation chart and drawing more appealing and informative
-        start_time=time.time()
+        start_time = time.time()
         y_predict = [1 if o > 0.5 else 0 for o in self.classifier.predict(X_test)]
-        end_time = time.time()  
-        evaluation_time = end_time - start_time 
-        st.write(f"Evaluation time: {evaluation_time} seconds")
-        st.write("Accuracy: {:.2f}%".format(100 * accuracy_score(y_test, y_predict)))
-        st.write("Precision: {:.2f}%".format(100 * precision_score(y_test, y_predict)))
-        st.write("Recall: {:.2f}%".format(100 * recall_score(y_test, y_predict)))
-        st.write("F1 Score: {:.2f}%".format(100 * f1_score(y_test, y_predict)))
+        end_time = time.time()
+        testing_time = end_time - start_time
+        st.success(f"Testing finished successfully in `{testing_time:0.2f}` secs.")
+        recall_score_ = recall_score(y_test, y_predict)
+        precision_score_ = precision_score(y_test, y_predict)
+        st.write(
+            f"Avarage Prediction Time: `{testing_time*1000/X_test.shape[0]:0.2f}` milliseconds."
+        )
+        st.write(f"Accuracy: `{100 * accuracy_score(y_test, y_predict):.2f}%`")
+        st.write(f"Precision: `{100 * precision_score_:.2f}%`")
+        st.write(f"Recall: `{100 * recall_score_:.2f}%`")
+        st.write(f"F1 Score: `{100 * f1_score(y_test, y_predict):.2f}%`")
+
         # Confusion Matrix
+        st.header("Confusion Matrix")
         cf_matrix = confusion_matrix(y_test, y_predict)
         fig = plt.figure()
         ax = fig.add_subplot()
@@ -88,16 +95,15 @@ class SpamClassifierApp:
         ax.xaxis.set_ticklabels(["Not Spam", "Spam"])
         ax.yaxis.set_ticklabels(["Not Spam", "Spam"])
         st.pyplot(ax.figure)  # type: ignore
+
         # ROC Curve
-        y = np.array([0, 0, 1, 1])
-        pred = np.array([0.1, 0.4, 0.35, 0.8])
-        fpr, tpr, thresholds = roc_curve(y, pred)
+        st.header("ROC Curve")
+        y_score = app.classifier.clf.predict(X_test)
+        fpr, tpr, _ = roc_curve(y_test, y_score)
         roc_auc = auc(fpr, tpr)
-        display = RocCurveDisplay(
-            fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name="example estimator"
-        )
-        
-        st.pyplot(display.plot().figure_)
+        roc_display = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc)
+        roc_display.plot()
+        st.pyplot(plt.gcf())  # type: ignore
 
 
 if __name__ == "__main__":
