@@ -7,6 +7,7 @@ import streamlit as st
 
 from preprocess import Preprocess
 
+
 dataset_folder = "datasets/archive"
 dataset_names = ["Spam Assassin", "EnronSpam", "LingSpam"]
 dataset_paths = [
@@ -21,7 +22,16 @@ dataset_name_2_path_dict = {
 
 class Datasets:
     @staticmethod
-    def get_single(raw: bool = False):
+    def get_single(raw: Optional[bool] = False):
+        """Get a single dataset from the dataset folder
+
+        Args:
+            raw (bool, optional): If True, return the raw dataset, else apply return the cleaned up dataset. Defaults to False.
+
+
+        Returns:
+            pandas.DataFrame: The selected dataset
+        """
         dataset_selectbox = st.selectbox("# Dataset", dataset_names)
         with st.spinner("Loading Data..."):
             raw_data = pd.read_csv(dataset_name_2_path_dict[dataset_selectbox])
@@ -45,7 +55,16 @@ class Datasets:
         return data.sample(data_size, random_state=42)
 
     @staticmethod
-    def get_multi(raw: bool = False):
+    def get_multi(raw: bool = False) -> pd.DataFrame:
+        """Get multiple datasets from the dataset folder
+
+        Args:
+            raw (bool, optional): If True, return the raw dataset, else apply return the cleaned up dataset. Defaults to False.
+
+
+        Returns:
+            pandas.DataFrame: The selected dataset
+        """
         dataset_name_multibox = st.multiselect(
             "# Dataset", dataset_names, dataset_names[0]
         )
@@ -81,7 +100,16 @@ class Datasets:
         return data.sample(data_size, random_state=42)
 
     @staticmethod
-    def clean_data(df: pd.DataFrame, sample: Optional[int] = None):
+    def clean_data(df: pd.DataFrame, sample_size: Optional[int] = None) -> pd.DataFrame:
+        """Clean the given dataset
+
+        Args:
+            df (pd.DataFrame): The dataset to clean
+            sample_size (int, optional): The size of the sample to return. Defaults to None.
+
+        Returns:
+            pd.DataFrame: The cleaned dataset
+        """
         data = df.copy()
         data.drop(
             data.columns[data.columns.str.contains("unnamed", case=False)],
@@ -93,14 +121,23 @@ class Datasets:
         data.drop(data[data["Body"] == "empty"].index, inplace=True)
         data.dropna(inplace=True)
 
-        if not sample:
+        if not sample_size:
             return data
 
-        assert isinstance(sample, int), "type of sample must be int"
-        return data.sample(sample)
+        assert isinstance(sample_size, int), "type of sample_size must be int"
+        return data.sample(sample_size)
 
     @staticmethod
-    def split_transform_data(data, preprocess: Preprocess):
+    def split_transform_data(data: pd.DataFrame, preprocess: Preprocess) -> tuple:
+        """Split the given dataset into train and test sets and apply the given preprocessing steps
+
+        Args:
+            data (pd.DataFrame): The dataset to split and preprocess
+            preprocess (Preprocess): The preprocessing steps to apply
+
+        Returns:
+            tuple: The preprocessed train and test sets and their corresponding labels
+        """
         emails_train, emails_test, target_train, target_test = train_test_split(
             data["Body"], data["Label"], test_size=0.2, random_state=42
         )
