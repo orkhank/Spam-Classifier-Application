@@ -1,35 +1,47 @@
 # TODO: implement SVM and its settings
 
 
-from sklearn.pipeline import Pipeline
 from classifiers.base import Classifier
-from preprocess import Preprocess
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn.model_selection import GridSearchCV
 from sklearn import svm
 import streamlit as st
 
 
 class SVM(Classifier):
     def __init__(self):
-        self.preprocess = Preprocess()
-        self.feature_extractor = None
-        self.algorithm = svm.SVC(kernel="linear")  # TODO: optimize hyperparameters
-        self.clf = None
+        self.algorithm_class = svm.SVC  
 
-    def get_parameters(self):
-        feature_extractor = st.selectbox(
-            "Select Feature Extractor", ["Count Vectorizer", "TF-IDF Vectorizer"]
-        )
-        selectbox2vectorizer = {  # TODO: optimize hyperparameters
-            "Count Vectorizer": CountVectorizer(),
-            "TF-IDF Vectorizer": TfidfVectorizer(),
-        }
-        self.feature_extractor = selectbox2vectorizer[feature_extractor]
-        self.clf = Pipeline(
-            [("vectorizer", self.feature_extractor), ("svm", self.algorithm)]
-        )
+    def get_algorithm_settings(self):
+        settings = dict()
+        with st.expander("SVM Hyperparameters"):
+            settings["C"] = st.slider(
+                "C",
+                0.0,
+                1.0,
+                0.5,
+                0.25,
+                help="Penalty parameter C of the error term.",
+            )
+            settings["kernel"] = st.selectbox(
+                "Kernel",
+                ["linear", "poly", "rbf", "sigmoid"],
+                index=0,
+                help="Specifies the kernel type to be used in the algorithm.",
+            )
+            settings["degree"] = st.slider(
+                "Degree",
+                1,
+                100,
+                10,
+                format="%01d",
+                help="Degree of the polynomial kernel function ('poly'). Ignored by all other kernels.",
+            )
+            settings["gamma"] = st.slider(
+                "Gamma",
+                0.0,
+                1.0,
+                0.5,
+                0.25,
+                help="Kernel coefficient for 'rbf', 'poly' and 'sigmoid'.",
+            )
 
-        self.optimize_hyperparameters = st.toggle(
-            "Optimize Hyperparameters", False, disabled=True
-        )
+        return settings
