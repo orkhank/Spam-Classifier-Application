@@ -50,7 +50,6 @@ class SpamClassifierApp:
         # tfidf_matrix = self.classifier.feature_extractor.fit_transform(X)
         # print(tfidf_matrix.toarray())
         # print(self.classifier.feature_extractor.vocabulary_)
-        # TODO: record train time(completed)
         start_time = time.time()  # Record the start time
 
         # Your training code here

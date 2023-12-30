@@ -8,7 +8,7 @@ import streamlit as st
 
 class SVM(Classifier):
     def __init__(self):
-        self.algorithm_class = svm.SVC  # TODO: optimize hyperparameters
+        self.algorithm_class = svm.SVC  
 
     def get_algorithm_settings(self):
         settings = dict()
