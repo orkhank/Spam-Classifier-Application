@@ -2,7 +2,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
 from st_pages import add_indentation
-
+from wordcloud import WordCloud
 from preprocess import Preprocess
 from dataset import Datasets
 
@@ -10,6 +10,12 @@ from dataset import Datasets
 def explore_data(data: pd.DataFrame):
     # TODO: add character_count, word_count, sentence_count information for each email and compare them based on ham/spam
     # Print samples
+
+    data['Character_Count'] = data['Body'].apply(len)
+    data['Word_Count'] = data['Body'].apply(lambda x: len(x.split()))
+    data['Sentence_Count'] = data['Body'].apply(lambda x: len(x.split('.')))
+
+
     with st.expander("Samples from the dataset(s)"):
         st.write(data.sample(5))
 
@@ -35,7 +41,15 @@ def explore_data(data: pd.DataFrame):
     data.info(buf=buffer)
     s = buffer.getvalue()
     st.text(s)
+    with st.expander("Word Clouds"):
+        spam_wordcloud = WordCloud(width=800, height=400).generate(' '.join(data[data['Label'] == 1]['Body']))
+        ham_wordcloud = WordCloud(width=800, height=400).generate(' '.join(data[data['Label'] == 0]['Body']))
 
+        st.write("## Spam Word Cloud")
+        st.image(spam_wordcloud.to_image(), caption="Spam Word Cloud", use_container_width=True)
+
+        st.write("## Ham Word Cloud")
+        st.image(ham_wordcloud.to_image(), caption="Ham Word Cloud", use_container_width=True)
     # TODO: Show word clouds
 
 

@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import time
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -49,14 +50,27 @@ class SpamClassifierApp:
         # tfidf_matrix = self.classifier.feature_extractor.fit_transform(X)
         # print(tfidf_matrix.toarray())
         # print(self.classifier.feature_extractor.vocabulary_)
-        # TODO: record train time
+        # TODO: record train time(completed)
+        start_time = time.time()  # Record the start time
+
+        # Your training code here
         self.classifier.fit(X, y)
+
+        end_time = time.time()  # Record the end time
+        training_time = end_time - start_time  # Calculate the training time in seconds
+        
+
+        st.write(f"Training time: {training_time} seconds")
+
 
     def evaluate_clf(self, X_test, y_test):
         # TODO: show evaluation/training time complexity
         # TODO: make the evaluation chart and drawing more appealing and informative
+        start_time=time.time()
         y_predict = [1 if o > 0.5 else 0 for o in self.classifier.predict(X_test)]
-
+        end_time = time.time()  
+        evaluation_time = end_time - start_time 
+        st.write(f"Evaluation time: {evaluation_time} seconds")
         st.write("Accuracy: {:.2f}%".format(100 * accuracy_score(y_test, y_predict)))
         st.write("Precision: {:.2f}%".format(100 * precision_score(y_test, y_predict)))
         st.write("Recall: {:.2f}%".format(100 * recall_score(y_test, y_predict)))
@@ -82,6 +96,7 @@ class SpamClassifierApp:
         display = RocCurveDisplay(
             fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name="example estimator"
         )
+        
         st.pyplot(display.plot().figure_)
 
 
