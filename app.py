@@ -1,7 +1,5 @@
 import matplotlib.pyplot as plt
 import time
-import numpy as np
-import pandas as pd
 import seaborn as sns
 import streamlit as st
 from st_pages import show_pages_from_config
@@ -37,12 +35,14 @@ class SpamClassifierApp:
 
     def get_settings(self):
         classifier_selectbox = st.selectbox(
-            "# Classifier", self.classifier_name_dict.keys()
+            "# Classifier",
+            self.classifier_name_dict.keys(),
+            help="The classifier to use for training and evaluation.",
         )
         assert classifier_selectbox is not None
         self.classifier = self.classifier_name_dict[classifier_selectbox]()
         self.classifier.get_parameters()
-        self.data = Datasets.get_single()
+        self.data = Datasets.get_multi()
         with st.expander("Configure Preprocess Steps"):
             self.preprocess.get_steps(None)
 
@@ -58,10 +58,8 @@ class SpamClassifierApp:
 
         end_time = time.time()  # Record the end time
         training_time = end_time - start_time  # Calculate the training time in seconds
-        
 
-        st.write(f"Training time: {training_time} seconds")
-
+        return training_time
 
     def evaluate_clf(self, X_test, y_test):
         # TODO: show evaluation/training time complexity
@@ -108,17 +106,50 @@ class SpamClassifierApp:
 
 if __name__ == "__main__":
     show_pages_from_config()
+
+    # Title and Description
+    st.title("Spam Classifier")
+    st.write(
+        """This is a spam classifier app built using streamlit.
+             To get started, select a classifier from the sidebar and click on the train button.
+             After the classifier is trained, you can evaluate it using the test button.
+             You can also configure the classifier's parameters and the preprocessing steps from the sidebar.
+             The dataset can be configured from the sidebar as well. 
+             The dataset can be explored from the data exploration page."""
+    )
+    st.divider()
+
     app = SpamClassifierApp()
     with st.sidebar:
         app.get_settings()
 
-    st.write(app.classifier.clf)
+    # st.write(app.classifier.clf)
 
     with st.spinner("Preparing Data..."):
         X_train, X_test, y_train, y_test = Datasets.split_transform_data(
             app.data, app.preprocess
         )
+
     with st.spinner("Training The Classifier..."):
-        naive_bayes_clf = app.train_clf(X_train, y_train)
-    with st.spinner("Evaluating The Classifier..."):
-        app.evaluate_clf(X_test, y_test)
+        training_time = app.train_clf(X_train, y_train)
+
+    st.success(
+        f"Classifier Trained Successfully! Training Time: `{training_time:0.2f}` secs"
+    )
+
+    eval_tab, custom_input_tab = st.tabs(
+        ["Evaluate the classifier", "Test with a text input"]
+    )
+
+    with custom_input_tab:
+        text_input = st.text_area("Enter a text to test the classifier")
+        if text_input:
+            with st.spinner("Preprocessing The Text..."):
+                preprocessed_text = app.preprocess.transform([text_input])
+            with st.spinner("Predicting..."):
+                prediction = app.classifier.predict(preprocessed_text)
+            st.markdown(f"Prediction: **`{'Spam' if prediction[0] == 1 else 'HAM'}`**")
+
+    with eval_tab:
+        with st.spinner("Evaluating The Classifier..."):
+            app.evaluate_clf(X_test, y_test)
