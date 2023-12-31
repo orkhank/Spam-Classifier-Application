@@ -3,13 +3,9 @@ import time
 import seaborn as sns
 import streamlit as st
 from st_pages import show_pages_from_config
-from sklearn.model_selection import train_test_split
-from classifiers.base import Classifier
 from dataset import Datasets
 from preprocess import Preprocess
-from classifiers.naive_bayes import NaiveBayes
-from classifiers.svm import SVM
-from classifiers.random_forest import RandomForest
+from classifiers import NaiveBayes, SVM, RandomForest, Classifier
 from sklearn.metrics import (
     RocCurveDisplay,
     accuracy_score,
@@ -23,6 +19,13 @@ from sklearn.metrics import (
 
 
 class SpamClassifierApp:
+    """
+    This class represents a Streamlit application for spam classification.
+    It allows users to select a classifier, configure preprocessing steps,
+    train the classifier, evaluate its performance, and make predictions on
+    custom text inputs.
+    """
+
     def __init__(self):
         self.data = None
         self.classifier_name_dict: dict[str, type[Classifier]] = {
@@ -34,6 +37,10 @@ class SpamClassifierApp:
         self.preprocess = Preprocess()
 
     def get_settings(self):
+        """
+        Displays the settings sidebar where users can select a classifier
+        and configure preprocessing steps.
+        """
         classifier_selectbox = st.selectbox(
             "# Classifier",
             self.classifier_name_dict.keys(),
@@ -47,9 +54,16 @@ class SpamClassifierApp:
             self.preprocess.get_steps(None)
 
     def train_clf(self, X, y):
-        # tfidf_matrix = self.classifier.feature_extractor.fit_transform(X)
-        # print(tfidf_matrix.toarray())
-        # print(self.classifier.feature_extractor.vocabulary_)
+        """
+        Trains the classifier using the provided training data.
+
+        Args:
+            X (array-like): The training data features.
+            y (array-like): The training data labels.
+
+        Returns:
+            float: The training time in seconds.
+        """
         start_time = time.time()  # Record the start time
 
         # Your training code here
@@ -61,8 +75,14 @@ class SpamClassifierApp:
         return training_time
 
     def evaluate_clf(self, X_test, y_test):
-        # TODO: show evaluation/training time complexity
-        # TODO: make the evaluation chart and drawing more appealing and informative
+        """
+        Evaluates the classifier using the provided test data and displays
+        evaluation metrics, confusion matrix, and ROC curve.
+
+        Args:
+            X_test (array-like): The test data features.
+            y_test (array-like): The test data labels.
+        """
         start_time = time.time()
         y_predict = [1 if o > 0.5 else 0 for o in self.classifier.predict(X_test)]
         end_time = time.time()
@@ -109,12 +129,8 @@ if __name__ == "__main__":
     # Title and Description
     st.title("Spam Classifier")
     st.write(
-        """This is a spam classifier app built using streamlit.
-             To get started, select a classifier from the sidebar and click on the train button.
-             After the classifier is trained, you can evaluate it using the test button.
-             You can also configure the classifier's parameters and the preprocessing steps from the sidebar.
-             The dataset can be configured from the sidebar as well. 
-             The dataset can be explored from the data exploration page."""
+        """ This is a Streamlit app for spam classification.
+        It allows users to select a classifier, configure preprocessing steps, train the classifier, evaluate its performance, and make predictions on custom text inputs."""
     )
     st.divider()
 

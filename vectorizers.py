@@ -4,6 +4,10 @@ import streamlit as st
 
 
 class Vectorizer(ABC):
+    """
+    Abstract base class for vectorizers.
+    """
+
     @abstractmethod
     def __init__(self) -> None:
         pass
@@ -13,13 +17,23 @@ class Vectorizer(ABC):
         pass
 
     def get_vectorizer(self):
+        """
+        Returns the vectorizer object.
+        """
         return self.vectorizer
 
     def get_settings(self):
+        """
+        Returns the settings dictionary for the vectorizer.
+        """
         return self.settings
 
     @classmethod
     def vectorizer_selection(cls):
+        """
+        Allows the user to select a vectorizer and its settings.
+        Returns the selected vectorizer object.
+        """
         vectorizer_names = [
             f"{subclass.__name__} Vectorizer" for subclass in cls.__subclasses__()
         ]
@@ -31,7 +45,9 @@ class Vectorizer(ABC):
         )
         selectbox2vectorizer = {
             vectorizer_name: vectorizer()
-            for vectorizer_name, vectorizer in zip(vectorizer_names, cls.__subclasses__())
+            for vectorizer_name, vectorizer in zip(
+                vectorizer_names, cls.__subclasses__()
+            )
         }
 
         feature_extractor = selectbox2vectorizer[feature_extractor_name]
@@ -43,10 +59,18 @@ class Vectorizer(ABC):
 
 
 class TFIDF(Vectorizer):
+    """
+    TF-IDF vectorizer class.
+    """
+
     def __init__(self):
         self.vectorizer_class = TfidfVectorizer
 
     def get_settings(self):
+        """
+        Allows the user to select settings for the TF-IDF vectorizer.
+        Returns the settings dictionary.
+        """
         settings = dict()
         settings["ngram_range"] = st.selectbox(
             "N-Gram Range",
@@ -91,10 +115,18 @@ class TFIDF(Vectorizer):
 
 
 class Count(Vectorizer):
+    """
+    Count vectorizer class.
+    """
+
     def __init__(self):
         self.vectorizer_class = CountVectorizer
 
     def get_settings(self):
+        """
+        Allows the user to select settings for the Count vectorizer.
+        Returns the settings dictionary.
+        """
         settings = dict()
         settings["ngram_range"] = st.selectbox(
             "N-Gram Range",

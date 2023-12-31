@@ -1,37 +1,36 @@
 """
-This module is used to compare the different classifiers and their settings.    
+This module is used to compare the different classifiers and their settings.
+
+It provides functions to plot the accuracy and runtime of classifiers as a function of different parameters, such as the number of training examples and runtime. The module also includes a main function that compares the performance of various classifiers on a given dataset using different preprocessing steps and vectorizers.
+
+Functions:
+- plot_accuracy: Plots the accuracy as a function of a given parameter.
+- plot_runtime: Plots the runtime as a function of a given parameter.
+- plot: Plots the accuracy, runtime, and training times of classifiers.
 """
 
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 import time
 import streamlit as st
-from st_pages import show_pages_from_config
-from sklearn.model_selection import train_test_split
-from classifiers.base import Classifier
-from classifiers.vectorizers import Vectorizer
+from vectorizers import Vectorizer
 from dataset import Datasets
 from preprocess import Preprocess
-from classifiers.naive_bayes import NaiveBayes
-from classifiers.svm import SVM
-from classifiers.random_forest import RandomForest
-import streamlit as st
-from sklearn.metrics import (
-    RocCurveDisplay,
-    accuracy_score,
-    auc,
-    confusion_matrix,
-    f1_score,
-    precision_score,
-    recall_score,
-    roc_curve,
-)
+from classifiers import NaiveBayes, SVM, RandomForest
+from sklearn.metrics import accuracy_score
 
 
 def plot_accuracy(x, y, x_legend):
-    """Plot accuracy as a function of x."""
+    """Plot accuracy as a function of x.
+
+    Args:
+        x (list): The values of x.
+        y (list): The corresponding accuracy values.
+        x_legend (str): The label for the x-axis.
+
+    Returns:
+        None
+    """
     x = np.array(x)
     y = np.array(y)
     plt.title("Classification accuracy as a function of %s" % x_legend)
@@ -40,8 +39,18 @@ def plot_accuracy(x, y, x_legend):
     plt.grid(True)
     plt.plot(x, y)
 
+
 def plot_runtime(x, y, x_legend):
-    """Plot runtime as a function of x."""
+    """Plot runtime as a function of x.
+
+    Args:
+        x (list): The values of x.
+        y (list): The corresponding runtime values.
+        x_legend (str): The label for the x-axis.
+
+    Returns:
+        None
+    """
     x = np.array(x)
     y = np.array(y)
     plt.title("Classification runtime as a function of %s" % x_legend)
@@ -50,7 +59,17 @@ def plot_runtime(x, y, x_legend):
     plt.grid(True)
     plt.plot(x, y)
 
+
 def plot(cls_stats, n_test_documents):
+    """Plot accuracy, runtime, and training times of classifiers.
+
+    Args:
+        cls_stats (dict): A dictionary containing the statistics of each classifier.
+        n_test_documents (int): The number of test documents.
+
+    Returns:
+        None
+    """
     cls_names = list(sorted(cls_stats.keys()))
 
     # Plot accuracy evolution
@@ -73,7 +92,7 @@ def plot(cls_stats, n_test_documents):
         idx = np.argsort(run_times)
         run_times = np.array(run_times)[idx]
         accuracies = np.array(accuracies)[idx]
-        
+
         plot_accuracy(run_times, accuracies, "runtime (s)")
         ax = plt.gca()
         ax.set_ylim((0.8, 1))
@@ -102,7 +121,14 @@ def plot(cls_stats, n_test_documents):
     ax.set_title("Training Times")
 
     def autolabel(rectangles):
-        """attach some text vi autolabel on rectangles."""
+        """Attach some text via autolabel on rectangles.
+
+        Args:
+            rectangles (list): List of rectangles.
+
+        Returns:
+            None
+        """
         for rect in rectangles:
             height = rect.get_height()
             ax.text(
