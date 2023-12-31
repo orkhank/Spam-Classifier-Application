@@ -8,7 +8,7 @@ import streamlit as st
 
 class SVM(Classifier):
     def __init__(self):
-        self.algorithm_class = svm.SVC  
+        self.algorithm_class = svm.SVC
 
     def get_algorithm_settings(self):
         settings = dict()
@@ -17,7 +17,7 @@ class SVM(Classifier):
                 "C",
                 0.0,
                 1.0,
-                0.5,
+                1.0,
                 0.25,
                 help="Penalty parameter C of the error term.",
             )
@@ -31,17 +31,15 @@ class SVM(Classifier):
                 "Degree",
                 1,
                 100,
-                10,
+                3,
                 format="%01d",
                 help="Degree of the polynomial kernel function ('poly'). Ignored by all other kernels.",
             )
-            settings["gamma"] = st.slider(
+            settings["gamma"] = st.selectbox(
                 "Gamma",
-                0.0,
-                1.0,
-                0.5,
-                0.25,
-                help="Kernel coefficient for 'rbf', 'poly' and 'sigmoid'.",
+                ["scale", "auto"],
+                index=0,
+                help="Kernel coefficient for 'rbf', 'poly' and 'sigmoid'. If gamma='scale' (default) is passed then it uses 1 / (n_features * X.var()) as value of gamma, if 'auto', uses 1 / n_features.",
             )
 
         return settings

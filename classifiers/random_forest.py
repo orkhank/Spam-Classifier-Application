@@ -20,7 +20,7 @@ class RandomForest(Classifier):
                 "N Estimators",
                 1,
                 100,
-                10,
+                100,
                 help="The number of trees in the forest.",
             )
             settings["criterion"] = st.selectbox(
@@ -29,34 +29,19 @@ class RandomForest(Classifier):
                 index=0,
                 help="The function to measure the quality of a split.",
             )
-            settings["max_depth"] = st.slider(
-                "Max Depth",
-                1,
-                100,
-                10,
-                format="%01d",
-                help="The maximum depth of the tree. If None, then nodes are expanded until all leaves are pure or until all leaves contain less than min_samples_split samples.",
-            )
             settings["min_samples_split"] = st.slider(
                 "Min Samples Split",
-                1,
-                100,
+                2,
                 10,
+                2,
                 help="The minimum number of samples required to split an internal node.",
             )
             settings["min_samples_leaf"] = st.slider(
                 "Min Samples Leaf",
                 1,
-                100,
                 10,
-                help="The minimum number of samples required to be at a leaf node.",
-            )
-            settings["max_features"] = st.slider(
-                "Max Features",
                 1,
-                100,
-                10,
-                help="The number of features to consider when looking for the best split.",
+                help="The minimum number of samples required to be at a leaf node.",
             )
 
         return settings

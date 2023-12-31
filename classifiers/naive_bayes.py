@@ -22,12 +22,13 @@ class NaiveBayes(Classifier):
                 "Alpha",
                 0.0,
                 1.0,
-                0.5,
+                1.0,
                 0.25,
                 help="Additive (Laplace/Lidstone) smoothing parameter (0 for no smoothing).",
             )
             settings["fit_prior"] = st.toggle(
                 "Fit Prior",
+                True,
                 help="Whether to learn class prior probabilities or not. If false, a uniform prior will be used.",
             )
 
