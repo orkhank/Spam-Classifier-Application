@@ -89,7 +89,7 @@ class Datasets:
         Datasets.assert_datasets_exist()
         
         dataset_name_multibox = st.multiselect(
-            "# Dataset", dataset_names, dataset_names[0]
+            "# Dataset", dataset_names, dataset_names[0], help="The dataset(s) to use for training and testing. If multiple datasets are selected, they will be concatenated and randomly sampled."
         )
 
         if not dataset_name_multibox:
