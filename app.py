@@ -95,7 +95,7 @@ class SpamClassifierApp:
 
         # ROC Curve
         st.header("ROC Curve")
-        y_score = app.classifier.clf.predict(X_test)
+        y_score = app.classifier.pipeline.predict(X_test)
         fpr, tpr, _ = roc_curve(y_test, y_score)
         roc_auc = auc(fpr, tpr)
         roc_display = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc)
