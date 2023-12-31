@@ -170,8 +170,6 @@ class Datasets:
         def cached_preprocess(data):
             return preprocess.transform(data)
 
-        # TODO: find some way to decrease the decrease preprocessing time (current version TAKES AGES)
-        # ? Maybe preprocess all datasets before hand and let the user choose if it is worth to wait for the customs preprocess steps to finish or just use fast and the default preset
         preprocessed_emails_train = cached_preprocess(emails_train)
         preprocessed_emails_test = cached_preprocess(emails_test)
 

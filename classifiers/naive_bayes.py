@@ -1,4 +1,3 @@
-# TODO: for some reason TF-IDF Vectorizer performs worse than count vectorizer on SOME occasions but not all... Find out why and fix the issue
 import numpy as np
 import pandas as pd
 from sklearn.naive_bayes import (

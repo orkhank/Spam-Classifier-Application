@@ -1,6 +1,3 @@
-# TODO: implement RandomForest and its settings
-
-
 from classifiers.base import Classifier
 from sklearn.ensemble import RandomForestClassifier
 import streamlit as st

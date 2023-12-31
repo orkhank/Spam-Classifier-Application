@@ -1,5 +1,3 @@
-# TODO: implement a better way to preprocess text. the current version is way too inefficient
-
 import re
 import string
 import numpy as np
@@ -314,17 +312,3 @@ class Preprocess:
         # st.write(results)
 
         return results
-
-
-# TODO: add something like to following (taken from https://gtraskas.github.io/post/ex6_spam/)
-# # Handle URLS.
-# # Look for strings starting with http:// or https://.
-# email_contents = re.sub('(http|https)://[^\s]*', 'httpaddr', email_contents)
-
-# # Handle Email Addresses.
-# # Look for strings with @ in the middle.
-# email_contents = re.sub('[^\s]+@[^\s]+', 'emailaddr', email_contents)
-
-# # Handle $ sign.
-# # Look for "$" and replace it with the text "dollar".
-# email_contents = re.sub('[$]+', 'dollar', email_contents)
