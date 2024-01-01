@@ -29,6 +29,3 @@ To run this application, download the project and navigate to the project direct
 streamlit run app.py
 ```
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE.md file for details.
