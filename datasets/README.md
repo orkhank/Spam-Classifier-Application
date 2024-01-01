@@ -9,13 +9,9 @@ The final tree structure of the directories should look like this:
 
 .
 ├── README.md
-├── algorithm.py
 ├── app.py
-├── classifiers
-│   ├── base.py
-│   ├── naive_bayes.py
-│   ├── random_forest.py
-│   └── svm.py
+├── classifiers.py
+├── comparisons.py
 ├── dataset.py
 ├── datasets
 │   ├── README.md
@@ -25,7 +21,8 @@ The final tree structure of the directories should look like this:
 │       └── lingSpam.csv
 ├── eda.py
 ├── preprocess.py
-└── requirements.txt
+├── requirements.txt
+└── vectorizers.py
 
 ```
 
